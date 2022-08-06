@@ -44,3 +44,5 @@ require (
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	google.golang.org/api v0.29.0
 )
+
+replace github.com/gagliardetto/solana-go => ../solana-go
