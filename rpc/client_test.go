@@ -1689,7 +1689,7 @@ func TestClient_GetSignaturesForAddress(t *testing.T) {
 		Before:         before,
 		Until:          until,
 		Commitment:     CommitmentMax,
-		MinContextSlot: uint64Ptr(minContextSlot),
+		MinContextSlot: &minContextSlot,
 	}
 	out, err := client.GetSignaturesForAddressWithOpts(
 		context.Background(),
