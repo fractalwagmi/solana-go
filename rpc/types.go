@@ -23,6 +23,7 @@ import (
 	"fmt"
 
 	bin "github.com/gagliardetto/binary"
+
 	"github.com/gagliardetto/solana-go"
 )
 
@@ -190,11 +191,11 @@ type InnerInstruction struct {
 	Index uint16 `json:"index"`
 
 	// Ordered list of inner program instructions that were invoked during a single transaction instruction.
-	Instructions []CompiledInstruction `json:"instructions"`
+	Instructions []solana.CompiledInstruction `json:"instructions"`
 }
 
-// 	Ok  interface{} `json:"Ok"`  // <null> Transaction was successful
-// 	Err interface{} `json:"Err"` // Transaction failed with TransactionError
+// Ok  interface{} `json:"Ok"`  // <null> Transaction was successful
+// Err interface{} `json:"Err"` // Transaction failed with TransactionError
 type DeprecatedTransactionMetaStatus M
 
 type TransactionSignature struct {
@@ -277,7 +278,6 @@ func (dt DataBytesOrJSON) MarshalJSON() ([]byte, error) {
 }
 
 func (wrap *DataBytesOrJSON) UnmarshalJSON(data []byte) error {
-
 	if len(data) == 0 || (len(data) == 4 && string(data) == "null") {
 		// TODO: is this an error?
 		return nil
@@ -394,7 +394,7 @@ const (
 // Parsed Transaction
 type CompiledTransaction struct {
 	Signatures []solana.Signature `json:"signatures"`
-	Message    Message            `json:"message"`
+	Message    solana.Message     `json:"message"`
 }
 
 type ParsedTransaction struct {
@@ -438,25 +438,10 @@ type ParsedInnerInstruction struct {
 	Instructions []*ParsedInstruction `json:"instructions"`
 }
 
-type Message struct {
-	AccountKeys     []solana.PublicKey    `json:"accountKeys"`
-	RecentBlockhash solana.Hash           `json:"recentBlockhash"`
-	Instructions    []CompiledInstruction `json:"instructions"`
-	Header          solana.MessageHeader  `json:"header"`
-}
-
 type ParsedMessageAccount struct {
 	PublicKey solana.PublicKey `json:"pubkey"`
 	Signer    bool             `json:"signer"`
 	Writable  bool             `json:"writable"`
-}
-
-type CompiledInstruction struct {
-	Accounts       []int64          `json:"accounts,omitempty"`
-	Data           solana.Base58    `json:"data,omitempty"`
-	Parsed         *InstructionInfo `json:"parsed,omitempty"`
-	Program        string           `json:"program,omitempty"`
-	ProgramIDIndex uint16           `json:"programIdIndex"`
 }
 
 type ParsedMessage struct {
@@ -483,15 +468,12 @@ type InstructionInfo struct {
 	InstructionType string                 `json:"type"`
 }
 
-func (p *CompiledInstruction) IsParsed() bool {
-	return p.Parsed != nil
-}
-
 type TransactionOpts struct {
-	Encoding            string         `json:"encoding,omitempty"`
-	SkipPreflight       bool           `json:"skipPreflight,omitempty"`
-	PreflightCommitment CommitmentType `json:"preflightCommitment,omitempty"`
-	MaxRetries          *uint          `json:"maxRetries"`
+	Encoding            solana.EncodingType `json:"encoding,omitempty"`
+	SkipPreflight       bool                `json:"skipPreflight,omitempty"`
+	PreflightCommitment CommitmentType      `json:"preflightCommitment,omitempty"`
+	MaxRetries          *uint               `json:"maxRetries"`
+	MinContextSlot      *uint64             `json:"minContextSlot"`
 }
 
 func (opts *TransactionOpts) ToMap() M {
@@ -512,6 +494,10 @@ func (opts *TransactionOpts) ToMap() M {
 
 	if opts.MaxRetries != nil {
 		obj["maxRetries"] = *opts.MaxRetries
+	}
+
+	if opts.MinContextSlot != nil {
+		obj["minContextSlot"] = *opts.MinContextSlot
 	}
 
 	return obj
