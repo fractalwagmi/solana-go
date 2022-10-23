@@ -98,6 +98,8 @@ type TransactionWithMeta struct {
 	Transaction *DataBytesOrJSON `json:"transaction"`
 	// Transaction status metadata object
 	Meta *TransactionMeta `json:"meta,omitempty"`
+
+	Version TransactionVersion `json:"version"`
 }
 
 func (twm TransactionWithMeta) MustGetTransaction() *solana.Transaction {

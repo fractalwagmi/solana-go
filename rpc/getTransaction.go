@@ -90,6 +90,8 @@ type GetTransactionResult struct {
 
 	Transaction *TransactionResultEnvelope `json:"transaction" bin:"optional"`
 	Meta        *TransactionMeta           `json:"meta,omitempty" bin:"optional"`
+
+	Version TransactionVersion `json:"version"`
 }
 
 // TransactionResultEnvelope will contain a *CompiledTransaction if the requested encoding is `solana.EncodingJSON`
